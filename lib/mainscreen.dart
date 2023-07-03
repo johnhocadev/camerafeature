@@ -1,0 +1,274 @@
+import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:app/utils/constants.dart';
+import 'package:app/utils/custom_button.dart';
+import 'package:camera/camera.dart';
+import 'package:dotted_border/dotted_border.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:sensors_plus/sensors_plus.dart';
+
+class MainScreen extends StatefulWidget {
+  const MainScreen({Key? key}) : super(key: key);
+
+  @override
+  State<MainScreen> createState() => _MainScreenState();
+}
+
+class _MainScreenState extends State<MainScreen> {
+  late List<CameraDescription> cameras;
+  late CameraController cameraController;
+
+  int direction = 0;
+  double posX = 0, posY = 0;
+
+late Rect _objectRect;
+//
+  late Rect _rect, _Rect, _referenceRect;
+  late Offset _start, _finish;
+  PageController _pageViewController = PageController();
+  @override
+  void initState() {
+
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+    ]);
+    startCamera(direction);
+    super.initState();
+  }
+
+  void startCamera(int direction) async {
+    cameras = await availableCameras();
+
+    cameraController = CameraController(
+      cameras[direction],
+      ResolutionPreset.high,
+      enableAudio: false,
+    );
+
+    await cameraController.initialize().then((value) {
+      if(!mounted) {
+        return;
+      }
+      setState(() {}); //To refresh widget
+    }).catchError((e) {
+      print(e);
+    });
+  }
+
+  @override
+  void dispose() {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+    cameraController.dispose();
+    super.dispose();
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+    if(cameraController.value.isInitialized) {
+      return Scaffold(
+        backgroundColor: Colors.transparent,
+
+
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Stack(
+            children: [
+              Positioned(
+                left: 25,
+                  right: 25,
+                  // bottom: 10,
+                  //
+                  // top: 10,
+                  child: CameraPreview(cameraController)),
+//TODO coordinator
+          Padding(  padding: const EdgeInsets.only(top: 150, bottom: 150, left: 725, right: 10),
+          child: Container(
+            height: 60,
+            width: 60,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(35),
+                border: Border.all(color: Colors.black, width: 2)
+            ),
+            child: Stack(
+
+
+              children: [
+                const Align(
+                  alignment: AlignmentDirectional.center,
+                  child: Divider(
+                    thickness: 2,
+                    color: Colors.black,
+                  ),
+                ),
+                const Align(
+                  alignment: AlignmentDirectional.center,
+                  child: VerticalDivider(
+                    thickness: 2,
+                    color: Colors.black,
+                  ),
+                ),
+                Center(
+                  child: StreamBuilder<GyroscopeEvent>(
+                      stream: SensorsPlatform.instance.gyroscopeEvents,
+                      builder: (context, snapshot) {
+                        // print("");
+                        if (snapshot.hasData) {
+                          posX = posX + (snapshot.data!.y*2);
+                          posY = posY + (snapshot.data!.x*2);
+                        }
+                        return Transform.translate(
+                          offset: Offset(posX, posY),
+                          child: const CircleAvatar(
+                            radius: 7,
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }),
+                ),
+              ],
+            ),
+          ),
+          ),
+              Padding(
+                padding: const EdgeInsets.only(top: 150, bottom: 150, right: 725, left: 10),
+                child: GestureDetector(
+                  onTap: () {
+                    cameraController.takePicture().then((XFile? file) {
+                      if(mounted) {
+                        if(file != null) {
+                          print("Picture saved to ${file.path}");
+                        }
+                      }
+                    });
+                  },
+                  child: button(Icons.camera_alt_outlined, Alignment.bottomCenter),
+                ),
+              ),
+              // Align(
+              //   alignment: AlignmentDirectional.center,
+              //   child: DottedBorder(
+              //     color: Colors.grey,
+              //     dashPattern: const [8, 4],
+              //     strokeWidth: 2
+              //     ,
+              //     child: Container(
+              //      height: 1,
+              //     ),
+              //
+              //   ),
+              //
+              // ),
+              Align(
+                alignment: AlignmentDirectional.topCenter,
+                child: AnimatedTextKit(
+                  animatedTexts: [
+                    ColorizeAnimatedText(
+                      '평평한 곳에서 촬영해주세요',
+                      textStyle: colorizeTextStyle,
+                      colors: colorizeColors,
+                    ),
+                  ],
+                  isRepeatingAnimation: true,
+                  onTap: () {
+                    print("Tap Event");
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 25),
+                child: Align(
+
+                  alignment: AlignmentDirectional.bottomCenter,
+                  child: DottedBorder(
+                    color: Colors.grey,
+                    dashPattern: const [8, 4],
+                    strokeWidth: 3,
+                    child: const SizedBox(
+                      height: 75,
+                      width: 200,
+                    ),
+                  ),
+                ),
+              ),
+
+              Align(
+                child: IconButton(
+                  icon: const Icon(Icons.alarm),
+                  onPressed: (){
+                     var objectLength = _objectRect.height /
+                              (_referenceRect.height / A4Height);
+                          var objectWidth = _objectRect.width /
+                              (_referenceRect.height / A4Height);
+                          objectLength =
+                              double.parse(objectLength.toStringAsFixed(2));
+                          objectWidth =
+                              double.parse(objectWidth.toStringAsFixed(2));
+                                showDialog(
+                            context: context,
+                            builder: (context) => Dialog(
+                              child: Padding(
+                                padding: const EdgeInsets.all(15.0),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: <Widget>[
+                                    Text(
+                                      "Saved!",
+                                 
+                                    ),
+                                    ListTile(
+                                      leading: Text("Object Length:"),
+                                      title: Text("$objectLength"),
+                                      trailing: Text("In"),
+                                    ),
+                                    ListTile(
+                                      leading: Text("Object Width:"),
+                                      title: Text("$objectWidth"),
+                                      trailing: Text("In"),
+                                    ),
+                                    MaterialButton(
+                                      color: Colors.blue,
+                                      child: Text(
+                                        "Done",
+                                      
+                                      ),
+                                      onPressed: () {
+                                        Navigator.pop(context, true);
+                                      },
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                  },
+                  
+                ),
+              )
+            ],
+          ),
+        ),
+      );
+    } else {
+      return const SizedBox();
+    }
+    var objectLength = _objectRect.height /
+    (_referenceRect.height / A4Height);
+var objectWidth = _objectRect.width /
+    (_referenceRect.height / A4Height);
+    objectLength =
+    double.parse(objectLength.toStringAsFixed(2));
+objectWidth =
+    double.parse(objectWidth.toStringAsFixed(2));
+  }
+
+final  A4Height = 11.6929;
+
+}
