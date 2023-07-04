@@ -1,6 +1,7 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:app/utils/constants.dart';
 import 'package:app/utils/custom_button.dart';
+import 'package:app/utils/dotted_line_test.dart';
 import 'package:camera/camera.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/cupertino.dart';
@@ -18,7 +19,6 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   late List<CameraDescription> cameras;
   late CameraController cameraController;
-
   int direction = 0;
   double posX = 0, posY = 0;
 
@@ -41,11 +41,11 @@ late Rect _objectRect;
   void startCamera(int direction) async {
     cameras = await availableCameras();
 
-    cameraController = CameraController(
-      cameras[direction],
-      ResolutionPreset.high,
-      enableAudio: false,
-    );
+    // cameraController = CameraController(
+    //   cameras[direction],
+    //   ResolutionPreset.high,
+    //   enableAudio: false,
+    // );
 
     await cameraController.initialize().then((value) {
       if(!mounted) {
@@ -72,7 +72,7 @@ late Rect _objectRect;
 
   @override
   Widget build(BuildContext context) {
-    if(cameraController.value.isInitialized) {
+    // if(cameraController.value.isInitialized) {
       return Scaffold(
         backgroundColor: Colors.transparent,
 
@@ -81,21 +81,21 @@ late Rect _objectRect;
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Stack(
             children: [
-              Positioned(
-                left: 25,
-                  right: 25,
-                  // bottom: 10,
-                  //
-                  // top: 10,
-                  child: CameraPreview(cameraController)),
+              // Positioned(
+              //   left: 25,
+              //     right: 25,
+              //     // bottom: 10,
+              //     //
+              //     // top: 10,
+              //     child: CameraPreview(cameraController)),
 //TODO coordinator
-          Padding(  padding: const EdgeInsets.only(top: 150, bottom: 150, left: 725, right: 10),
+          Padding(  padding: const EdgeInsets.only(top: 185,  right: 725, left: 35),
           child: Container(
             height: 60,
             width: 60,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(35),
-                border: Border.all(color: Colors.black, width: 2)
+                border: Border.all(color: Colors.blue, width: 2)
             ),
             child: Stack(
 
@@ -119,10 +119,10 @@ late Rect _objectRect;
                   child: StreamBuilder<GyroscopeEvent>(
                       stream: SensorsPlatform.instance.gyroscopeEvents,
                       builder: (context, snapshot) {
-                        // print("");
+
                         if (snapshot.hasData) {
-                          posX = posX + (snapshot.data!.y*2);
-                          posY = posY + (snapshot.data!.x*2);
+                          posX = posX + (snapshot.data!.y*3);
+                          posY = posY + (snapshot.data!.x*3);
                         }
                         return Transform.translate(
                           offset: Offset(posX, posY),
@@ -137,8 +137,9 @@ late Rect _objectRect;
             ),
           ),
           ),
+          //TODO picture taking function
               Padding(
-                padding: const EdgeInsets.only(top: 150, bottom: 150, right: 725, left: 10),
+                padding: const EdgeInsets.only(bottom: 171,  left: 725, right: 10),
                 child: GestureDetector(
                   onTap: () {
                     cameraController.takePicture().then((XFile? file) {
@@ -152,6 +153,26 @@ late Rect _objectRect;
                   child: button(Icons.camera_alt_outlined, Alignment.bottomCenter),
                 ),
               ),
+              //TODO straight line in the middle of screen 
+            
+              const Align(
+                alignment: AlignmentDirectional.center,
+                child: MySeparator()),
+                //TODO length identifier 
+                const Align(
+                alignment: AlignmentDirectional.center,
+                child:Padding(
+                  padding: EdgeInsets.only(right: 260),
+                  child: LengthIdentifier(),
+                ) ),
+              //TODO here must be the length of fish
+                const Align(
+                alignment: AlignmentDirectional.center,
+                child:Padding(
+                  padding: EdgeInsets.only(left: 240),
+                  child: LengthIdentifier(),
+                ) ),
+               
               // Align(
               //   alignment: AlignmentDirectional.center,
               //   child: DottedBorder(
@@ -162,9 +183,9 @@ late Rect _objectRect;
               //     child: Container(
               //      height: 1,
               //     ),
-              //
+              
               //   ),
-              //
+              
               // ),
               Align(
                 alignment: AlignmentDirectional.topCenter,
@@ -199,66 +220,66 @@ late Rect _objectRect;
                 ),
               ),
 
-              Align(
-                child: IconButton(
-                  icon: const Icon(Icons.alarm),
-                  onPressed: (){
-                     var objectLength = _objectRect.height /
-                              (_referenceRect.height / A4Height);
-                          var objectWidth = _objectRect.width /
-                              (_referenceRect.height / A4Height);
-                          objectLength =
-                              double.parse(objectLength.toStringAsFixed(2));
-                          objectWidth =
-                              double.parse(objectWidth.toStringAsFixed(2));
-                                showDialog(
-                            context: context,
-                            builder: (context) => Dialog(
-                              child: Padding(
-                                padding: const EdgeInsets.all(15.0),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: <Widget>[
-                                    Text(
-                                      "Saved!",
-                                 
-                                    ),
-                                    ListTile(
-                                      leading: Text("Object Length:"),
-                                      title: Text("$objectLength"),
-                                      trailing: Text("In"),
-                                    ),
-                                    ListTile(
-                                      leading: Text("Object Width:"),
-                                      title: Text("$objectWidth"),
-                                      trailing: Text("In"),
-                                    ),
-                                    MaterialButton(
-                                      color: Colors.blue,
-                                      child: Text(
-                                        "Done",
-                                      
-                                      ),
-                                      onPressed: () {
-                                        Navigator.pop(context, true);
-                                      },
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
-                  },
-                  
-                ),
-              )
+              // Align(
+              //   child: IconButton(
+              //     icon: const Icon(Icons.alarm),
+              //     onPressed: (){
+              //        var objectLength = _objectRect.height /
+              //                 (_referenceRect.height / A4Height);
+              //             var objectWidth = _objectRect.width /
+              //                 (_referenceRect.height / A4Height);
+              //             objectLength =
+              //                 double.parse(objectLength.toStringAsFixed(2));
+              //             objectWidth =
+              //                 double.parse(objectWidth.toStringAsFixed(2));
+              //                   showDialog(
+              //               context: context,
+              //               builder: (context) => Dialog(
+              //                 child: Padding(
+              //                   padding: const EdgeInsets.all(15.0),
+              //                   child: Column(
+              //                     mainAxisSize: MainAxisSize.min,
+              //                     children: <Widget>[
+              //                       Text(
+              //                         "Saved!",
+              //
+              //                       ),
+              //                       ListTile(
+              //                         leading: Text("Object Length:"),
+              //                         title: Text("$objectLength"),
+              //                         trailing: Text("In"),
+              //                       ),
+              //                       ListTile(
+              //                         leading: Text("Object Width:"),
+              //                         title: Text("$objectWidth"),
+              //                         trailing: Text("In"),
+              //                       ),
+              //                       MaterialButton(
+              //                         color: Colors.blue,
+              //                         child: Text(
+              //                           "Done",
+              //
+              //                         ),
+              //                         onPressed: () {
+              //                           Navigator.pop(context, true);
+              //                         },
+              //                       )
+              //                     ],
+              //                   ),
+              //                 ),
+              //               ),
+              //             );
+              //     },
+              //
+              //   ),
+              // )
             ],
           ),
         ),
       );
-    } else {
-      return const SizedBox();
-    }
+    // } else {
+    //   return const SizedBox();
+    // }
     var objectLength = _objectRect.height /
     (_referenceRect.height / A4Height);
 var objectWidth = _objectRect.width /
