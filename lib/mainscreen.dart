@@ -41,11 +41,11 @@ late Rect _objectRect;
   void startCamera(int direction) async {
     cameras = await availableCameras();
 
-    // cameraController = CameraController(
-    //   cameras[direction],
-    //   ResolutionPreset.high,
-    //   enableAudio: false,
-    // );
+    cameraController = CameraController(
+      cameras[direction],
+      ResolutionPreset.high,
+      enableAudio: false,
+    );
 
     await cameraController.initialize().then((value) {
       if(!mounted) {
@@ -72,7 +72,7 @@ late Rect _objectRect;
 
   @override
   Widget build(BuildContext context) {
-    // if(cameraController.value.isInitialized) {
+    if(cameraController.value.isInitialized) {
       return Scaffold(
         backgroundColor: Colors.transparent,
 
@@ -80,6 +80,7 @@ late Rect _objectRect;
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Stack(
+            //TODO camera itself 
             children: [
               // Positioned(
               //   left: 25,
@@ -277,9 +278,9 @@ late Rect _objectRect;
           ),
         ),
       );
-    // } else {
-    //   return const SizedBox();
-    // }
+    } else {
+      return const SizedBox();
+    }
     var objectLength = _objectRect.height /
     (_referenceRect.height / A4Height);
 var objectWidth = _objectRect.width /
