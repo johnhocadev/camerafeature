@@ -9,8 +9,8 @@ Widget button(IconData icon, Alignment alignment) {
         left: 20,
         bottom: 20,
       ),
-      height: 50,
-      width: 50,
+      height: 60,
+      width: 60,
       decoration: const BoxDecoration(
         shape: BoxShape.circle,
         color: Colors.white,

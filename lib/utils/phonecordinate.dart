@@ -55,7 +55,7 @@ double posX = 0, posY = 0;
                   color: Colors.black,
                 ),
               ),
-               Align(
+               const Align(
                 alignment: AlignmentDirectional.center,
                 child: VerticalDivider(
                   thickness: 2,

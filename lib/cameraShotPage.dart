@@ -1,4 +1,5 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:app/picture_priview.dart';
 import 'package:app/utils/constants.dart';
 import 'package:app/utils/custom_button.dart';
 import 'package:app/utils/dotted_line_test.dart';
@@ -8,6 +9,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sensors_plus/sensors_plus.dart';
+
 
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
@@ -27,6 +29,8 @@ late Rect _objectRect;
   late Rect _rect, _Rect, _referenceRect;
   late Offset _start, _finish;
   PageController _pageViewController = PageController();
+
+
   @override
   void initState() {
 
@@ -42,9 +46,13 @@ late Rect _objectRect;
     cameras = await availableCameras();
 
     cameraController = CameraController(
+    
       cameras[direction],
       ResolutionPreset.high,
       enableAudio: false,
+      imageFormatGroup: ImageFormatGroup.yuv420,
+
+      
     );
 
     await cameraController.initialize().then((value) {
@@ -72,7 +80,10 @@ late Rect _objectRect;
 
   @override
   Widget build(BuildContext context) {
-    if(cameraController.value.isInitialized) {
+
+    var size =MediaQuery.of(context).size;
+    double height = size.height;
+    double width = size.width;
       return Scaffold(
         backgroundColor: Colors.transparent,
 
@@ -82,15 +93,14 @@ late Rect _objectRect;
           child: Stack(
             //TODO camera itself 
             children: [
-              // Positioned(
-              //   left: 25,
-              //     right: 25,
-              //     // bottom: 10,
-              //     //
-              //     // top: 10,
-              //     child: CameraPreview(cameraController)),
+              Positioned(
+                left: 25,
+                  right: 25,
+                  child: CameraPreview(cameraController)),
 //TODO coordinator
-          Padding(  padding: const EdgeInsets.only(top: 185,  right: 725, left: 35),
+          Positioned(
+                           bottom: height /2.33,
+                left: 25,
           child: Container(
             height: 60,
             width: 60,
@@ -106,14 +116,14 @@ late Rect _objectRect;
                   alignment: AlignmentDirectional.center,
                   child: Divider(
                     thickness: 2,
-                    color: Colors.black,
+                    color: Colors.blue,
                   ),
                 ),
                 const Align(
                   alignment: AlignmentDirectional.center,
                   child: VerticalDivider(
                     thickness: 2,
-                    color: Colors.black,
+                    color: Colors.blue,
                   ),
                 ),
                 Center(
@@ -139,19 +149,20 @@ late Rect _objectRect;
           ),
           ),
           //TODO picture taking function
-              Padding(
-                padding: const EdgeInsets.only(bottom: 171,  left: 725, right: 10),
+              Positioned(
+                bottom: height /2.7,
+                right: 13,
                 child: GestureDetector(
                   onTap: () {
                     cameraController.takePicture().then((XFile? file) {
                       if(mounted) {
                         if(file != null) {
-                          print("Picture saved to ${file.path}");
+                          Navigator.push(context, MaterialPageRoute(builder: (context)=> PreviewPage(picture: file)));
                         }
                       }
                     });
                   },
-                  child: button(Icons.camera_alt_outlined, Alignment.bottomCenter),
+                  child: button(Icons.camera_alt_outlined, Alignment.bottomCenter,),
                 ),
               ),
               //TODO straight line in the middle of screen 
@@ -173,21 +184,7 @@ late Rect _objectRect;
                   padding: EdgeInsets.only(left: 240),
                   child: LengthIdentifier(),
                 ) ),
-               
-              // Align(
-              //   alignment: AlignmentDirectional.center,
-              //   child: DottedBorder(
-              //     color: Colors.grey,
-              //     dashPattern: const [8, 4],
-              //     strokeWidth: 2
-              //     ,
-              //     child: Container(
-              //      height: 1,
-              //     ),
-              
-              //   ),
-              
-              // ),
+
               Align(
                 alignment: AlignmentDirectional.topCenter,
                 child: AnimatedTextKit(
@@ -200,7 +197,7 @@ late Rect _objectRect;
                   ],
                   isRepeatingAnimation: true,
                   onTap: () {
-                    print("Tap Event");
+                  
                   },
                 ),
               ),
@@ -220,6 +217,40 @@ late Rect _objectRect;
                   ),
                 ),
               ),
+
+            ],
+          ),
+        ),
+      );
+
+}}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//     var objectLength = _objectRect.height /
+//     (_referenceRect.height / A4Height);
+// var objectWidth = _objectRect.width /
+//     (_referenceRect.height / A4Height);
+//     objectLength =
+//     double.parse(objectLength.toStringAsFixed(2));
+// objectWidth =
+//     double.parse(objectWidth.toStringAsFixed(2));
+//   }
+
+// final  A4Height = 11.6929;
+
 
               // Align(
               //   child: IconButton(
@@ -274,23 +305,3 @@ late Rect _objectRect;
               //
               //   ),
               // )
-            ],
-          ),
-        ),
-      );
-    } else {
-      return const SizedBox();
-    }
-    var objectLength = _objectRect.height /
-    (_referenceRect.height / A4Height);
-var objectWidth = _objectRect.width /
-    (_referenceRect.height / A4Height);
-    objectLength =
-    double.parse(objectLength.toStringAsFixed(2));
-objectWidth =
-    double.parse(objectWidth.toStringAsFixed(2));
-  }
-
-final  A4Height = 11.6929;
-
-}

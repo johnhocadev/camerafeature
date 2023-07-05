@@ -1,8 +1,24 @@
+
+
+
+import 'package:get_it/get_it.dart';
 import 'package:camera/camera.dart';
+
+
+
+
 
 class CameraService {
   CameraController? _cameraController;
   CameraController? get cameraController => _cameraController;
+final locator = GetIt.instance;
+
+
+
+//Locator 
+void setupLocator() {
+  locator.registerLazySingleton<CameraService>(() => CameraService());
+}
 
   Future<void> initialize() async {
     if (_cameraController != null) return;
