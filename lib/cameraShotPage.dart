@@ -22,7 +22,7 @@ class _MainScreenState extends State<MainScreen> {
   late List<CameraDescription> cameras;
   late CameraController cameraController;
   int direction = 0;
-  double posX = 0, posY = 0;
+  double posX = 3, posY = -1;
 
 late Rect _objectRect;
 //
@@ -132,8 +132,11 @@ late Rect _objectRect;
                       builder: (context, snapshot) {
 
                         if (snapshot.hasData) {
+                       
                           posX = posX + (snapshot.data!.y*3);
                           posY = posY + (snapshot.data!.x*3);
+                          print(posX.toStringAsFixed(2));
+                          print(posY.toStringAsFixed(2));
                         }
                         return Transform.translate(
                           offset: Offset(posX, posY),
