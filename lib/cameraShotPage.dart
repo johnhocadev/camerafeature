@@ -22,7 +22,7 @@ class _MainScreenState extends State<MainScreen> {
   late List<CameraDescription> cameras;
   late CameraController cameraController;
   int direction = 0;
-  double posX = 3, posY = -1;
+  double posX = 0, posY = -1;
 
 late Rect _objectRect;
 //
@@ -33,13 +33,19 @@ late Rect _objectRect;
 
   @override
   void initState() {
-
+  super.initState();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeRight,
       DeviceOrientation.landscapeLeft,
     ]);
+ 
     startCamera(direction);
-    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_){
+
+ customAlertDialog();
+
+});
   }
 
   void startCamera(int direction) async {
@@ -77,10 +83,15 @@ late Rect _objectRect;
     super.dispose();
   }
 
+@override
+  void didChangeDependencies() {
+  
+    super.didChangeDependencies();
+  }
 
   @override
   Widget build(BuildContext context) {
-
+ 
     var size =MediaQuery.of(context).size;
     double height = size.height;
     double width = size.width;
@@ -226,7 +237,23 @@ late Rect _objectRect;
         ),
       );
 
-}}
+}
+ 
+ customAlertDialog(){
+  return showDialog(context: context, builder: (_){
+    return CupertinoAlertDialog(
+    title: const Text('알림'),
+    content: const Text('핸드폰 회전을 켜서 물체를 측정하기 위해 전화기를 똑바로 유지하십시오.'),
+    actions: [
+      GestureDetector(
+        onTap: ()=> Navigator.pop(context),
+        child: const CupertinoDialogAction(child:  Text('OK')))
+    ],
+  );
+  }
+  );
+ }
+}
 
 
 
