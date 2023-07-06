@@ -20,9 +20,11 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   late List<CameraDescription> cameras;
-  late CameraController cameraController;
+  //TODO error causing line 
+   late CameraController cameraController;
+  
   int direction = 0;
-  double posX = 0, posY = -1;
+  double posX = 2, posY = 5;
 
 late Rect _objectRect;
 //
@@ -50,14 +52,14 @@ late Rect _objectRect;
 
   void startCamera(int direction) async {
     cameras = await availableCameras();
-
+// var cameraSpecs = const CameraDescription(name: 'photo ', lensDirection: CameraLensDirection.back, sensorOrientation: 180);
     cameraController = CameraController(
     
       cameras[direction],
       ResolutionPreset.high,
       enableAudio: false,
       imageFormatGroup: ImageFormatGroup.yuv420,
-
+   
       
     );
 
@@ -110,49 +112,47 @@ late Rect _objectRect;
                   child: CameraPreview(cameraController)),
 //TODO coordinator
           Positioned(
-                           bottom: height /2.33,
+                           bottom: height /2.42,
                 left: 25,
-          child: Container(
-            height: 60,
-            width: 60,
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(35),
-                border: Border.all(color: Colors.blue, width: 2)
-            ),
+          child: CircleAvatar(
+          
+            backgroundColor: const Color.fromARGB(255, 202, 233, 248),
+            radius: 37,
+
             child: Stack(
-
-
+          
+          
               children: [
                 const Align(
                   alignment: AlignmentDirectional.center,
                   child: Divider(
-                    thickness: 2,
-                    color: Colors.blue,
+                    thickness: 2.5,
+                    color: Colors.red,
                   ),
                 ),
                 const Align(
                   alignment: AlignmentDirectional.center,
                   child: VerticalDivider(
-                    thickness: 2,
-                    color: Colors.blue,
+                    thickness: 2.5,
+                    color: Colors.red,
                   ),
                 ),
                 Center(
                   child: StreamBuilder<GyroscopeEvent>(
                       stream: SensorsPlatform.instance.gyroscopeEvents,
                       builder: (context, snapshot) {
-
+          
                         if (snapshot.hasData) {
-                       
+                      
                           posX = posX + (snapshot.data!.y*3);
                           posY = posY + (snapshot.data!.x*3);
-                          print(posX.toStringAsFixed(2));
-                          print(posY.toStringAsFixed(2));
                         }
                         return Transform.translate(
-                          offset: Offset(posX, posY),
+                          filterQuality: FilterQuality.high,
+                          offset: Offset( posY,posY ),
+                        
                           child: const CircleAvatar(
-                            radius: 7,
+                            radius: 6,
                             backgroundColor: Colors.red,
                           ),
                         );
@@ -171,7 +171,7 @@ late Rect _objectRect;
                     cameraController.takePicture().then((XFile? file) {
                       if(mounted) {
                         if(file != null) {
-                          Navigator.push(context, MaterialPageRoute(builder: (context)=> PreviewPage(picture: file)));
+                          Navigator.push(context, MaterialPageRoute(builder: (context)=> PreviewPage(picture: file,)));
                         }
                       }
                     });

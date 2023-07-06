@@ -34,7 +34,11 @@ class PreviewPage extends StatelessWidget {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          Image.file(File(picture.path)),
+          Padding(
+
+            padding: const EdgeInsets.only(left: 30, right: 30),
+            child: Image.file(File(picture.path,), fit: BoxFit.fitWidth,),
+          ),
         ],
       ),
     );
